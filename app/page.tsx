@@ -8,12 +8,14 @@ import { useState, useEffect } from 'react';
 export default function Home() {
   const { user } = useAuth()
   const [positions, setPositions] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:8080');
 
     ws.onmessage = (event) => {
       setPositions(JSON.parse(event.data));
+      setIsLoading(false);
     };
 
     return () => {
@@ -49,47 +51,63 @@ export default function Home() {
         {user && (
           <div className="mt-8 bg-blue-900 rounded-lg p-8 w-full max-w-4xl">
             <h2 className="text-2xl font-bold mb-6 text-white">Your Positions</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-white border-collapse">
-                <thead>
-                  <tr className="bg-blue-800">
-                    <th className="p-3 text-left">PositionID</th>
-                    <th className="p-3 text-left">Symbol</th>
-                    <th className="p-3 text-left">Qty</th>
-                    <th className="p-3 text-left">AverageCost</th>
-                    <th className="p-3 text-left">UnrealizedPnL</th>
-                    <th className="p-3 text-left">Currency</th>
-                    <th className="p-3 text-left">CurrentPrice</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.values(positions).map((position: any) => (
-                    <tr key={position.PositionID} className="border-b border-blue-700 hover:bg-blue-800 transition-colors">
-                      <td className="p-3">{position.PositionID}</td>
-                      <td className="p-3">{position.Symbol}</td>
-                      <td className="p-3">{position.Qty}</td>
-                      <td className="p-3">{position.AverageCost.toFixed(2)}</td>
-                      <td
-                        className={`p-3 ${
-                          position.UnrealizedPnL > 0
-                            ? 'text-green-400'
-                            : position.UnrealizedPnL < 0
-                            ? 'text-red-400'
-                            : 'text-white'
-                        }`}
-                      >
-                        {position.UnrealizedPnL.toFixed(2)}
-                      </td>
-                      <td className="p-3">{position.Currency}</td>
-                      <td className="p-3">{position.CurrentPrice.toFixed(2)}</td>
+            {isLoading ? (
+              <div className="flex justify-center items-center">
+                <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-white border-collapse">
+                  <thead>
+                    <tr className="bg-blue-800">
+                      <th className="p-3 text-left">PositionID</th>
+                      <th className="p-3 text-left">Symbol</th>
+                      <th className="p-3 text-left">Qty</th>
+                      <th className="p-3 text-left">AverageCost</th>
+                      <th className="p-3 text-left">UnrealizedPnL</th>
+                      <th className="p-3 text-left">Currency</th>
+                      <th className="p-3 text-left">CurrentPrice</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {Object.values(positions).map((position: any) => (
+                      <tr key={position.PositionID} className="border-b border-blue-700 hover:bg-blue-800 transition-colors">
+                        <td className="p-3">{position.PositionID}</td>
+                        <td className="p-3">{position.Symbol}</td>
+                        <td className="p-3">{position.Qty}</td>
+                        <td className="p-3">{position.AverageCost.toFixed(2)}</td>
+                        <td
+                          className={`p-3 ${
+                            position.UnrealizedPnL > 0
+                              ? 'text-green-400'
+                              : position.UnrealizedPnL < 0
+                              ? 'text-red-400'
+                              : 'text-white'
+                          }`}
+                        >
+                          {position.UnrealizedPnL.toFixed(2)}
+                        </td>
+                        <td className="p-3">{position.Currency}</td>
+                        <td className="p-3">{position.CurrentPrice.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </main>
+      <style jsx>{`
+        .loader {
+          border-top-color: #3498db;
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
