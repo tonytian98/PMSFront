@@ -18,6 +18,29 @@ export default function Home() {
       setIsLoading(false);
     };
 
+    /*
+      //first get  stompjs in package.json
+
+   
+      stompClient.connect({}, (frame) => {
+          console.log('Connected: ' + frame);
+
+          // Subscribe to a topic
+          stompClient.subscribe('/topic/greetings', (message) => {
+              if (message.body) {
+                  console.log('Received: ' + message.body);
+              }
+                  setPositions(JSON.parse(message.body));
+    
+          });
+
+          // Send a message to a topic
+          stompClient.send('/topic/greetings', {}, JSON.stringify({'message': 'Hello, STOMP!'}));
+      }, (error) => {
+          console.error('Connection error: ' + error);
+      });
+    */
+
     return () => {
       ws.close();
     };
